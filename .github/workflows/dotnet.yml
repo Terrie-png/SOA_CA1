@@ -21,8 +21,8 @@ jobs:
       with:
         dotnet-version: 8.0.x
     - name: Restore dependencies
-      run: dotnet restore
+      run: dotnet restore SOA_CA1/SOA_CA1/SOA_CA1.csproj
     - name: Build
-      run: dotnet build --no-restore
+      run: dotnet build SOA_CA1/SOA_CA1/SOA_CA1.csproj --no-restore
     - name: Test
-      run: dotnet test --no-build --verbosity normal
+      run: dotnet test SOA_CA1/SOA_CA1/SOA_CA1.csproj --verbosity normal
