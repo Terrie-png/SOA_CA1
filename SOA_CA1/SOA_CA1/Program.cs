@@ -1,11 +1,15 @@
+using SOA_CA1.Clients.Models;
 using SOA_CA1.Components;
+using SOA_CA1.Services;
+using SOA_CA1.Services.Interfaces;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddRazorComponents()
 	.AddInteractiveServerComponents();
-
+builder.Services.AddScoped<IGoogleBooksService, GoogleBooksService>();
+builder.Services.AddScoped<GoogleBooksResponseModel>();
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
