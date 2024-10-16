@@ -3,12 +3,13 @@ using RestSharp;
 using SOA_CA1.Clients.Models;
 using SOA_CA1.Services.Interfaces;
 using System.Diagnostics;
+using Microsoft.AspNetCore.Mvc;
 
 namespace SOA_CA1.Services
 {
 	public class GoogleBooksService : BaseWebService, IGoogleBooksService
 	{
-		private static readonly string google_url = "https://www.googleapis.com/books/v1/volumes?key=AIzaSyAtJu64O6GgSiyOMRmzdV_zrdmouHBmsOs";
+		private static readonly string google_url = "https://www.googleapis.com/books/v1/volumes?";
 		private readonly RestClient _client;
 
 		public GoogleBooksService()
@@ -16,7 +17,7 @@ namespace SOA_CA1.Services
 			_client = new RestClient(google_url);
 		}
 
-		public async Task<GoogleBooksResponseModel> SearchBooksAsync(string query)
+		public async Task<Book> SearchBooksAsync(string query)
 		{
 			var request = new RestRequest();
 			request.AddParameter("q", query);
@@ -26,7 +27,7 @@ namespace SOA_CA1.Services
 			{
 				try
 				{
-					GoogleBooksResponseModel books = JsonSerializer.Deserialize<GoogleBooksResponseModel>(response.Content);
+					GoogleBooksResponseModel books = JsonSerializer.Deserialize<Book>(response.Content);
 					return books;
 				}
 				catch (JsonException ex)
