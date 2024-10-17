@@ -1,8 +1,75 @@
-﻿@page "/Books/{id:int}"
+﻿@page "/Books/{id}"
+@using Services.Interfaces
+@inject IGoogleBooksService service
+@inject INewsAPIService newsService
+@inject NavigationManager Navigation
+@using Clients.Models
+@using Microsoft.AspNetCore.WebUtilities
 
 
 <h3>BookSection</h3>
 
+@Id
+@if(selectedBook != null)
+{
+	<p>@bookInfo.Title</p>
+}
+
+@if(news != null){
+	for (int i = 0; i < 5;i++)
+	{
+		<p>
+			@articles[i].Title
+		</p>
+	}
+}
+
+<p> @categories</p>
+
 @code {
+	[Parameter]
+	public string Id{ get; set; }
+
+	public Book selectedBook;
+	public VolumeInfo bookInfo;
+
+	public NewsApiResponseModel news;
+	public List<Article> articles;
+	public bool error { get; set; } = false;
+
+	public string categories { get; set; }
+
+	protected override async Task OnInitializedAsync()
+	{
+		await CallAPI();
+		var uri = Navigation.ToAbsoluteUri(Navigation.Uri);
+
+		if(QueryHelpers.ParseQuery(uri.Query).TryGetValue("categories", out var category))
+		{
+			categories = (String) category ?? " ";
+		}
+
+		await CallNewsAPI();
+
+	}
+
+	public async Task CallAPI()
+	{
+		selectedBook = await service.GetBookByIdAsync(Id);
+		bookInfo = selectedBook.VolumeInfo;
+	}
+
+	public async Task CallNewsAPI()
+	{
+		if (categories != null)
+		{
+			news = await newsService.SearchAsync(categories);
+			Console.WriteLine(news);
+			if(news != null)
+			{
+				articles = news.Articles;
+			}
+		}
+	}
 
 }

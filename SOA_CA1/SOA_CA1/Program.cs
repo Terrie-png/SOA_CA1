@@ -5,11 +5,20 @@ using SOA_CA1.Services.Interfaces;
 
 var builder = WebApplication.CreateBuilder(args);
 
+builder.Services.AddSingleton(builder.Configuration);
 // Add services to the container.
 builder.Services.AddRazorComponents()
 	.AddInteractiveServerComponents();
 builder.Services.AddScoped<IGoogleBooksService, GoogleBooksService>();
-builder.Services.AddScoped<GoogleBooksResponseModel>();
+builder.Services.AddScoped<INewsAPIService, NewsAPIService>();
+var googleApiKey = builder.Configuration["GoogleBookAPI:APIKey"];
+var googleBaseUrl= builder.Configuration["GoogleBookAPI:Base_Url"];
+
+var newsApiKey = builder.Configuration["NewsAPI:APIKey"];
+var newsBaseUrl= builder.Configuration["NewsAPI:Base_Url"];
+
+//builder.Services.AddSingleton
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.

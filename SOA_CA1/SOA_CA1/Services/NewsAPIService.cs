@@ -2,22 +2,20 @@
 using RestSharp;
 using SOA_CA1.Clients.Models;
 using System.Text.Json;
+using SOA_CA1.Services.Interfaces;
 namespace SOA_CA1.Services
 {
-	public class NewsAPIService :BaseWebService
-	{
-		private static readonly string google_url = "https://newsapi.org/v2/everything?apiKey=e0e82d634a254df98f89d7596a91df3e&sortBy=popularity";
-		private readonly RestClient _client;
-
-		public NewsAPIService()
+	public class NewsAPIService :BaseWebService<NewsApiResponseModel>, INewsAPIService
+	{ 
+		public NewsAPIService(IConfiguration configuration):base(configuration, "NewsAPI")
 		{
-			_client = new RestClient(google_url);
 		}
 
-		public async Task<NewsApiResponseModel> SearchNewsAsync(string query)
+		public override async Task<NewsApiResponseModel> SearchAsync(string query)
 		{
 			var request = new RestRequest();
 			request.AddParameter("q", query);
+			request.AddParameter("apiKey", _apiKey);
 			var response = await _client.ExecuteAsync(request);
 
 			if (response.IsSuccessful && !string.IsNullOrWhiteSpace(response.Content))
@@ -25,6 +23,7 @@ namespace SOA_CA1.Services
 				try
 				{
 					NewsApiResponseModel news = JsonSerializer.Deserialize<NewsApiResponseModel>(response.Content);
+                    
 					return news;
 				}
 				catch (JsonException ex)

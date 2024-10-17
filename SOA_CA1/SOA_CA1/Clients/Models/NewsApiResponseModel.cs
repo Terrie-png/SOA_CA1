@@ -11,7 +11,7 @@ namespace SOA_CA1.Clients.Models
 		public int TotalResults { get; set; }
 
 		[JsonPropertyName("articles")]
-		public List<Article>? Article { get; set; }
+		public List<Article>? Articles { get; set; }
 	}
 
 	public class Article

@@ -7,27 +7,25 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace SOA_CA1.Services
 {
-	public class GoogleBooksService : BaseWebService, IGoogleBooksService
+	public class GoogleBooksService :BaseWebService<GoogleBooksResponseModel>, IGoogleBooksService
 	{
-		private static readonly string google_url = "https://www.googleapis.com/books/v1/volumes?";
-		private readonly RestClient _client;
 
-		public GoogleBooksService()
+		public GoogleBooksService(IConfiguration configuration):base(configuration, "GoogleBookAPI")
 		{
-			_client = new RestClient(google_url);
 		}
 
-		public async Task<Book> SearchBooksAsync(string query)
+		public override async Task<GoogleBooksResponseModel> SearchAsync(string query)
 		{
 			var request = new RestRequest();
 			request.AddParameter("q", query);
+			request.AddParameter("key", _apiKey);
 			var response = await _client.ExecuteAsync(request);
 
 			if (response.IsSuccessful && !string.IsNullOrWhiteSpace(response.Content))
 			{
 				try
 				{
-					GoogleBooksResponseModel books = JsonSerializer.Deserialize<Book>(response.Content);
+					GoogleBooksResponseModel books = JsonSerializer.Deserialize<GoogleBooksResponseModel>(response.Content);
 					return books;
 				}
 				catch (JsonException ex)
@@ -43,17 +41,18 @@ namespace SOA_CA1.Services
 			}
 		}
 
-		public async Task<GoogleBooksResponseModel> GetBookByIdAsync(string id)
+		public async Task<Book> GetBookByIdAsync(string id)
 		{
 			var request = new RestRequest($"/{id}");
-
-			var response = await _client.ExecuteAsync(request);
+            request.AddParameter("key", "AIzaSyBlQNMSHNAM4Z2tZV_he03yIEnG5ddp9oo");
+            var response = await _client.ExecuteAsync(request);
 
 			if (response.IsSuccessful && !string.IsNullOrWhiteSpace(response.Content))
 			{
 				try
 				{
-					return JsonSerializer.Deserialize<GoogleBooksResponseModel>(response.Content);
+					Book book = JsonSerializer.Deserialize<Book>(response.Content);
+					return book;
 				}
 				catch (JsonException ex)
 				{
@@ -64,7 +63,7 @@ namespace SOA_CA1.Services
 			}
 			else
 			{
-				throw new InvalidOperationException($"Failed to retrieve book details: {response.ErrorMessage}");
+				return null;
 			}
 		}
 	}
