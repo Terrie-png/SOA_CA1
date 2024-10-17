@@ -7,6 +7,14 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="Components\app.razor.css" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="Components\App.razor.css" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Folder Include="Clients\Interfaces\" />
   </ItemGroup>
 

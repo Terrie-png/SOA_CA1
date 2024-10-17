@@ -6,70 +6,85 @@
 @using Clients.Models
 @using Microsoft.AspNetCore.WebUtilities
 
+<div class="book-section">
+    <h3>Book Details</h3>
 
-<h3>BookSection</h3>
+    @Id
+    @if (selectedBook != null)
+    {
+        <div class="book-details">
+            <div class="image-section">
+                <img src="@bookInfo.ImageLinks?.Large" alt="Not Available" class="book-image" />
+            </div>
+            <h4>@bookInfo.Title</h4>
+            <p><strong>Authors:</strong> @bookInfo.Authors</p>
+            <p><strong>Description:</strong> @bookInfo.Description</p>
+            <p><strong>Publisher:</strong> @bookInfo.Publisher</p>
+            <p><strong>Published Date:</strong> @bookInfo.PublishedDate</p>
+            <p><strong>Page Count:</strong> @bookInfo.PageCount</p>
+            <p><strong>Average Rating:</strong> @bookInfo.AverageRating</p>
+            <p><strong>Language:</strong> @bookInfo.Language</p>
+            <p><a href="@selectedBook.SaleInfo.BuyLink" target="_blank" class="buy-link">Buy Link</a></p>
+        </div>
+    }
 
-@Id
-@if(selectedBook != null)
-{
-	<p>@bookInfo.Title</p>
-}
+    @if (news != null)
+    {
+        <div class="news-section">
+            <h4>Related News Articles</h4>
+            @for (int i = 0; i < 5; i++)
+            {
+                <div class="news-article">
+                    <p>@articles[i].Title</p>
+                </div>
+            }
+        </div>
+    }
 
-@if(news != null){
-	for (int i = 0; i < 5;i++)
-	{
-		<p>
-			@articles[i].Title
-		</p>
-	}
-}
-
-<p> @categories</p>
+    <p class="categories"><strong>Categories:</strong> @categories</p>
+</div>
 
 @code {
-	[Parameter]
-	public string Id{ get; set; }
+    [Parameter]
+    public string Id { get; set; }
 
-	public Book selectedBook;
-	public VolumeInfo bookInfo;
+    public Book selectedBook;
+    public VolumeInfo bookInfo;
 
-	public NewsApiResponseModel news;
-	public List<Article> articles;
-	public bool error { get; set; } = false;
+    public NewsApiResponseModel news;
+    public List<Article> articles;
+    public bool error { get; set; } = false;
 
-	public string categories { get; set; }
+    public string categories { get; set; }
 
-	protected override async Task OnInitializedAsync()
-	{
-		await CallAPI();
-		var uri = Navigation.ToAbsoluteUri(Navigation.Uri);
+    protected override async Task OnInitializedAsync()
+    {
+        await CallAPI();
+        var uri = Navigation.ToAbsoluteUri(Navigation.Uri);
 
-		if(QueryHelpers.ParseQuery(uri.Query).TryGetValue("categories", out var category))
-		{
-			categories = (String) category ?? " ";
-		}
+        if (QueryHelpers.ParseQuery(uri.Query).TryGetValue("categories", out var category))
+        {
+            categories = category.ToString() ?? " ";
+        }
 
-		await CallNewsAPI();
+        await CallNewsAPI();
+    }
 
-	}
+    public async Task CallAPI()
+    {
+        selectedBook = await service.GetBookByIdAsync(Id);
+        bookInfo = selectedBook.VolumeInfo;
+    }
 
-	public async Task CallAPI()
-	{
-		selectedBook = await service.GetBookByIdAsync(Id);
-		bookInfo = selectedBook.VolumeInfo;
-	}
-
-	public async Task CallNewsAPI()
-	{
-		if (categories != null)
-		{
-			news = await newsService.SearchAsync(categories);
-			Console.WriteLine(news);
-			if(news != null)
-			{
-				articles = news.Articles;
-			}
-		}
-	}
-
+    public async Task CallNewsAPI()
+    {
+        if (categories != null)
+        {
+            news = await newsService.SearchAsync(categories);
+            if (news != null)
+            {
+                articles = news.Articles;
+            }
+        }
+    }
 }

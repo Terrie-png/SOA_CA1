@@ -3,12 +3,15 @@ using RestSharp;
 using SOA_CA1.Clients.Models;
 using SOA_CA1.Services.Interfaces;
 using System.Diagnostics;
-using Microsoft.AspNetCore.Mvc;
+using SOA_CA1;
 
 namespace SOA_CA1.Services
 {
 	public class GoogleBooksService :BaseWebService<GoogleBooksResponseModel>, IGoogleBooksService
 	{
+		public IEnumerable<Book> SearchedBooks { get; set; }
+		public string SearchedText { get; set; }
+		static readonly int maxBooks = 40;
 
 		public GoogleBooksService(IConfiguration configuration):base(configuration, "GoogleBookAPI")
 		{
@@ -19,6 +22,7 @@ namespace SOA_CA1.Services
 			var request = new RestRequest();
 			request.AddParameter("q", query);
 			request.AddParameter("key", _apiKey);
+			request.AddParameter("maxResults", maxBooks);
 			var response = await _client.ExecuteAsync(request);
 
 			if (response.IsSuccessful && !string.IsNullOrWhiteSpace(response.Content))
@@ -26,6 +30,7 @@ namespace SOA_CA1.Services
 				try
 				{
 					GoogleBooksResponseModel books = JsonSerializer.Deserialize<GoogleBooksResponseModel>(response.Content);
+                    SearchedBooks = books.Books;
 					return books;
 				}
 				catch (JsonException ex)

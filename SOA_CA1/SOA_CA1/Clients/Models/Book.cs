@@ -71,6 +71,8 @@ namespace SOA_CA1.Clients.Models
 
 		[JsonPropertyName("categories")]
 		public List<string> Categories { get; set; }
+		[JsonPropertyName("averageRating")]
+		public int? AverageRating { get; set; }
 
 		[JsonPropertyName("maturityRating")]
 		public string MaturityRating { get; set; }

@@ -1,72 +1,60 @@
 ﻿@page "/Books"
 @using SOA_CA1.Services.Interfaces
-@inject  IGoogleBooksService service
+@inject IGoogleBooksService service
 
 @using SOA_CA1.Clients.Models
-<h3>BooksSection</h3>
 
-<input placeholder="Search here ... " @bind=searchQuery />
-<button @onclick="CallAPI">Search</button>
+<div class="search-container">
+    <h3>Books Section</h3>
+    <div class="search-bar">
+        <input class="search-input" placeholder="Search here ..." @bind="searchQuery" />
+        <button class="search-button" @onclick="CallAPI">Search</button>
+    </div>
+</div>
 
 @if (searched)
 {
-	@if(result == null)
-	{
-		<p>Loading Books...</p>
-	}
-	else if (result.Books.Count == 0|| result.Books == null)
-	{
-		<p>No Books Found</p>
-		@result.TotalItems
-	}
-	else
-	{
-		@result.Books.Count
-		<ul>
-			@foreach (Book volume in result.Books)
-			{
-				var categories = volume.VolumeInfo.Categories != null
-				? Uri.EscapeDataString(string.Join(",", volume.VolumeInfo.Categories))
-				: "null";
-				<li>
-					<h4>@(volume.VolumeInfo.Title ?? "Title not available")</h4>
-					<p>Authors: @(volume.VolumeInfo.Authors != null ? string.Join(", ", volume.VolumeInfo.Authors) : "Authors not available")</p>
-					<p>Description: @(volume.VolumeInfo.Description ?? "Description not available")</p>
-					<a href="/Books/@volume.Id?categories=@categories">Select</a>	
-				</li>
-			}
-		</ul>
-	
-	}
+    @if (result == null)
+    {
+        <p>Loading Books...</p>
+    }
+    else if (result.Books == null || result.Books.Count == 0)
+    {
+        <p>No Books Found</p>
+    }
+    else
+    {
+        <div class="book-container">
+            @foreach (Book volume in result.Books)
+            {
+                <div class="book-card">
+                    <img src="@volume.VolumeInfo.ImageLinks?.Thumbnail" alt="@volume.VolumeInfo.Title" class="book-image" />
+                    <div class="book-info">
+                        <h4>@(volume.VolumeInfo.Title ?? "Title not available")</h4>
+                        <p>Authors: @(volume.VolumeInfo.Authors != null ? string.Join(", ", volume.VolumeInfo.Authors) : "Authors not available")</p>
+                        <p class="description">Description: @(volume.VolumeInfo.Description ?? "Description not available")</p>
+                        <a href="/Books/@volume.Id?categories=@(volume.VolumeInfo.Categories != null ? Uri.EscapeDataString(string.Join(",", volume.VolumeInfo.Categories)) : "null")" class="btn">Select</a>
+                    </div>
+                </div>
+            }
+        </div>
+    }
 }
 
+
+
 @code {
-	private GoogleBooksResponseModel result;
-	private GoogleBooksResponseModel cache;
-	private List<Book> books;
-	private string searchQuery = "";
-	private bool searched = false;
+    private GoogleBooksResponseModel result;
+    private string searchQuery = "";
+    private bool searched = false;
 
-	protected override async Task OnInitializedAsync()
-	{
-	}
-
-	public async Task CallAPI()
-	{
-		searched = true;
-		if (searchQuery == "")
-		{
-			searchQuery = "flower";
-		}
-		result = await service.SearchAsync(searchQuery);
-		cache = result;
-		books = cache.Books;
-		
-	}
-
-	public async void RedirectToBookPage()
-	{
-		
-	}
-
+    public async Task CallAPI()
+    {
+        searched = true;
+        if (string.IsNullOrWhiteSpace(searchQuery))
+        {
+            searchQuery = "flower";
+        }
+        result = await service.SearchAsync(searchQuery);
+    }
 }

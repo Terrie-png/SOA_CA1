@@ -1,0 +1,91 @@
+﻿* {
+	margin: 0;
+	padding: 0;
+	box-sizing: border-box;
+}
+
+body {
+	font-family: Arial, sans-serif;
+	background-color: #f4f4f4;
+	color: #333;
+
+}
+
+header {
+	background-color: #007BFF;
+	color: #fff;
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	padding: 15px 20px;
+}
+
+	header .logo {
+		font-size: 24px;
+		font-weight: bold;
+	}
+
+nav ul {
+	list-style: none;
+	display: flex;
+}
+
+	nav ul li {
+		margin-left: 20px;
+	}
+
+		nav ul li a {
+			color: #fff;
+			text-decoration: none;
+			transition: color 0.3s;
+		}
+
+			nav ul li a:hover {
+				color: #FFD700; /* Gold color on hover */
+			}
+
+main {
+	padding: 20px;
+}
+
+.books-section {
+	background-color: #fff;
+	border-radius: 8px;
+	padding: 20px;
+	box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+	margin: 20px 0;
+}
+
+.search-container {
+	display: flex;
+	margin-bottom: 20px;
+}
+
+	.search-container input {
+		flex: 1;
+		padding: 10px;
+		border: 1px solid #ccc;
+		border-radius: 4px;
+		margin-right: 10px;
+	}
+
+	.search-container button {
+		padding: 10px 15px;
+		border: none;
+		background-color: #007BFF;
+		color: #fff;
+		border-radius: 4px;
+		cursor: pointer;
+		transition: background-color 0.3s;
+	}
+
+		.search-container button:hover {
+			background-color: #0056b3; /* Darker blue on hover */
+		}
+
+
+
+.main-body {
+	min-height: calc(90vh - 19px); /* Adjust based on header and footer height */
+	padding-bottom: 60px; /* Ensure footer does not overlap content */
+}

@@ -1,0 +1,92 @@
+﻿.book-section {
+    max-width: 90%;
+    margin: 10px auto 10px auto;
+    padding: 20px;
+    background-color: #f8f9fa;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+    .book-section h3 {
+        text-align: center;
+        margin-bottom: 20px;
+        color: #333;
+    }
+
+.book-details {
+    background: #ffffff;
+    padding: 15px;
+    border-radius: 6px;
+    margin-bottom: 20px;
+    box-shadow: 0 1px 5px rgba(0, 0, 0, 0.1);
+}
+
+    .book-details h4 {
+        margin-bottom: 10px;
+        color: #007bff;
+    }
+
+    .book-details p {
+        margin: 5px 0;
+        color: #555;
+    }
+
+        .book-details p strong {
+            color: #333;
+        }
+
+.buy-link {
+    color: #28a745;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+    .buy-link:hover {
+        color: #218838;
+        text-decoration: underline;
+    }
+
+.news-section {
+    margin-top: 20px;
+}
+
+    .news-section h4 {
+        color: #333;
+        margin-bottom: 10px;
+    }
+
+.news-article {
+    padding: 10px;
+    background: #f1f1f1;
+    border-radius: 4px;
+    margin-bottom: 10px;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+}
+
+    .news-article p {
+        margin: 0;
+        color: #333;
+    }
+
+.categories {
+    margin-top: 20px;
+    font-size: 0.9rem;
+    color: #777;
+    text-align: center;
+}
+
+
+.image-section {
+    display: flex;
+    justify-content: center; 
+    margin-bottom: 15px;
+}
+
+.book-image {
+    width: 100%; 
+    max-width: 300px; 
+    height: auto; 
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    display: block;
+}

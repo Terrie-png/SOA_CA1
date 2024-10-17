@@ -1,5 +1,6 @@
 ﻿@using SOA_CA1.Services.Interfaces
 @using SOA_CA1.Clients.Models
+@using SOA_CA1.Components.Layout
 <!DOCTYPE html>
 <html lang="en">
 
@@ -15,8 +16,13 @@
 </head>
 
 <body>
-    <Routes @rendermode=RenderMode.InteractiveServer />
+    <HeaderLayout/>
+    <div class="main-body">
+        <Routes @rendermode=RenderMode.InteractiveServer />
+    </div>
     <script src="_framework/blazor.web.js"></script>
+    <FooterLayout />
 </body>
 
 </html>
+
