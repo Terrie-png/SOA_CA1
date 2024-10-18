@@ -2,6 +2,7 @@
 
 @using SOA_CA1.Services.Interfaces
 @inject IUserService userService
+@inject NavigationManager NavigationManager
 @inject Blazored.SessionStorage.ISessionStorageService sessionStorage
 
 <SOA_CA1.Components.Layout.HeaderLayout />
@@ -62,6 +63,8 @@
             registrationSuccess = true;
             registrationFailed = false;
             await sessionStorage.SetItemAsync("username", username);
+            Task.Delay(2000).Wait();
+            NavigationManager.NavigateTo("/login");
         }
         else
         {
