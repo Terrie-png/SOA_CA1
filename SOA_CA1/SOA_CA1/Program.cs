@@ -11,6 +11,7 @@ builder.Services.AddRazorComponents()
 	.AddInteractiveServerComponents();
 builder.Services.AddScoped<IGoogleBooksService, GoogleBooksService>();
 builder.Services.AddScoped<INewsAPIService, NewsAPIService>();
+builder.Services.AddScoped<IUserService, UserService>();
 var googleApiKey = builder.Configuration["GoogleBookAPI:APIKey"];
 var googleBaseUrl= builder.Configuration["GoogleBookAPI:Base_Url"];
 
