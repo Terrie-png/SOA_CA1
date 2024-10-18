@@ -1,15 +1,31 @@
-﻿
+﻿@inject Blazored.SessionStorage.ISessionStorageService sessionStorage
+@inject NavigationManager NavigationManager
+@inject UserSession userSession
+
 <header>
-    <div class="logo">My Website</div>
+    <div class="logo">BooksU</div>
     <nav>
         <ul>
-            <li><a href="#home">Home</a></li>
-            <li><a href="#about">About</a></li>
-            <li><a href="#services">Services</a></li>
-            <li><a href="#contact">Contact</a></li>
+            @if ((userSession.Username != null && userSession.Username != "") || userSession.IsLoggedIn)
+            {
+                <li><a href="/">Search Books</a></li>
+                <li><a @onclick="clickLogout">Logout</a></li>
+
+            }
+            else
+            {
+                <li><a href="/login">Login</a></li>
+                <li><a href="/register">Register</a></li>
+            }
+            <li><span></span></li>
         </ul>
     </nav>
 </header>
 @code {
+    protected async void clickLogout()
+    {
+        userSession.logout();
+        NavigationManager.NavigateTo("/login");
+    }
 
 }

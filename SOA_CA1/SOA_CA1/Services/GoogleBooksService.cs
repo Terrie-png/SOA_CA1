@@ -10,7 +10,7 @@ namespace SOA_CA1.Services
 {
 	public class GoogleBooksService :BaseWebService<GoogleBooksResponseModel>, IGoogleBooksService
 	{
-		public GoogleBooksResponseModel cacheBook { get; set; }
+		public GoogleBooksResponseModel cacheBook { get; set; } = null;
 		public IEnumerable<Book> SearchedBooks { get; set; }
 		public string SearchedText { get; set; }
 		static readonly int maxBooks = 40;
@@ -41,12 +41,14 @@ namespace SOA_CA1.Services
 				{
 					// Log or handle the deserialization error
 					Debug.WriteLine($"Deserialization error: {ex.Message}");
-					throw new InvalidOperationException("Failed to parse book search response.", ex);
+                    Console.WriteLine(new InvalidOperationException("Failed to parse book search response.", ex));
+					return cacheBook;
 				}
 			}
 			else
 			{
-				throw new InvalidOperationException($"Failed to retrieve books: {response.ErrorMessage}");
+                Console.WriteLine(new InvalidOperationException($"Failed to retrieve books: {response.ErrorMessage}"));
+				return cacheBook;
 			}
 		}
 
@@ -73,12 +75,14 @@ namespace SOA_CA1.Services
                 {
                     // Log or handle the deserialization error
                     Debug.WriteLine($"Deserialization error: {ex.Message}");
-                    throw new InvalidOperationException("Failed to parse book search response.", ex);
+                    Console.WriteLine(new InvalidOperationException("Failed to parse book search response.", ex));
+					return cacheBook;
                 }
             }
             else
             {
-                throw new InvalidOperationException($"Failed to retrieve books: {response.ErrorMessage}");
+                Console.WriteLine(new InvalidOperationException($"Failed to retrieve books: {response.ErrorMessage}"));
+				return cacheBook; 
             }
         }
 
@@ -89,15 +93,21 @@ namespace SOA_CA1.Services
             {
                 return cacheBook;
             }
+			try { 
+				IEnumerable<Book> sortedBooks = ascending
+					? SearchedBooks.Where(book => !string.IsNullOrEmpty(book.VolumeInfo?.Title))
+									.OrderBy(book => book.VolumeInfo.Title)
+					: SearchedBooks.Where(book => !string.IsNullOrEmpty(book.VolumeInfo?.Title))
+									.OrderByDescending(book => book.VolumeInfo.Title);
 
-            IEnumerable<Book> sortedBooks = ascending
-                ? SearchedBooks.Where(book => !string.IsNullOrEmpty(book.VolumeInfo?.Title))
-                                .OrderBy(book => book.VolumeInfo.Title)
-                : SearchedBooks.Where(book => !string.IsNullOrEmpty(book.VolumeInfo?.Title))
-                                .OrderByDescending(book => book.VolumeInfo.Title);
-
-            cacheBook.Books = sortedBooks.ToList();
-            return cacheBook;
+				cacheBook.Books = sortedBooks.ToList();
+				return cacheBook;
+			}
+			catch
+			{
+				Console.WriteLine(new Exception("Something is wrong with the sort Alphabet"));
+				return cacheBook;
+			}
         }
 
 
@@ -107,12 +117,20 @@ namespace SOA_CA1.Services
             {
                 return cacheBook;
             }
+			try
+			{
+				IEnumerable<Book> sortedBooks = ascending ? SearchedBooks.Where(book => !string.IsNullOrEmpty(book.VolumeInfo?.PublishedDate)).OrderBy(book => book.VolumeInfo.PublishedDate)
+											:SearchedBooks.Where(book => !string.IsNullOrEmpty(book.VolumeInfo?.PublishedDate)).OrderByDescending(book => book.VolumeInfo.PublishedDate);
 
-			IEnumerable<Book> sortedBooks = ascending ? SearchedBooks.Where(book => !string.IsNullOrEmpty(book.VolumeInfo?.PublishedDate)).OrderBy(book => book.VolumeInfo.PublishedDate)
-										:SearchedBooks.Where(book => !string.IsNullOrEmpty(book.VolumeInfo?.PublishedDate)).OrderByDescending(book => book.VolumeInfo.PublishedDate);
+				cacheBook.Books = sortedBooks.ToList();
+				return cacheBook;
 
-			cacheBook.Books = sortedBooks.ToList();
-			return cacheBook;
+			}
+			catch
+			{
+				Console.WriteLine(new InvalidOperationException("Something Wrong with Sort Books By Date"));
+				return cacheBook;
+			}
 		}
 
         public async Task<Book> GetBookByIdAsync(string id)
@@ -132,7 +150,8 @@ namespace SOA_CA1.Services
 				{
 					// Log or handle the deserialization error
 					Debug.WriteLine($"Deserialization error: {ex.Message}");
-					throw new InvalidOperationException("Failed to parse book details response.", ex);
+                    Console.WriteLine(new InvalidOperationException("Failed to parse book details response.", ex));
+					return null;
 				}
 			}
 			else

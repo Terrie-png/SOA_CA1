@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Session;
 using SOA_CA1.Services.Interfaces;
 
 namespace SOA_CA1.Services
@@ -11,7 +12,7 @@ namespace SOA_CA1.Services
         {
             if (File.Exists(csvFilePath))
             {
-                var lines = File.ReadAllLines(csvFilePath);
+                var lines =  File.ReadAllLines(csvFilePath);
 
                 foreach (var line in lines.Skip(1))  // Skip header row
                 {
@@ -27,8 +28,9 @@ namespace SOA_CA1.Services
             return false;
         }
 
-        public bool RegisterUser(string username, string password, string email,int sex)
+        public bool RegisterUser(string username, string password, string email,string sex)
         {
+            
             if (File.Exists(csvFilePath))
             {
                 var lines = File.ReadAllLines(csvFilePath);
@@ -51,17 +53,18 @@ namespace SOA_CA1.Services
                 }
             }
 
-            string textSex = ((EnumSex)sex).ToString(); 
+            int sexID = (int)Enum.Parse(typeof(EnumSex), sex);
+           
 
             using (var writer = new StreamWriter(csvFilePath, true))
             {
-                writer.WriteLine($"{username},{password},{email},{textSex}");
+                writer.WriteLine($"{username},{password},{email},{sexID}");
             }
 
             return true; 
         }
+
+       
     }
+
 }
-//login through reading csv file and register through writing to csv file
-//using enum to check if the user had logged in or not before
-//pagination

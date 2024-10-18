@@ -1,58 +1,66 @@
 ﻿@page "/Books/{id}"
 @using Services.Interfaces
+@using Clients.Models
+@using Microsoft.AspNetCore.WebUtilities
 @inject IGoogleBooksService service
 @inject INewsAPIService newsService
 @inject NavigationManager Navigation
-@using Clients.Models
-@using Microsoft.AspNetCore.WebUtilities
+@inject NavigationManager NavigationManager
+@inject Blazored.SessionStorage.ISessionStorageService sessionStorage
+@inject UserSession userSession
 
+<SOA_CA1.Components.Layout.HeaderLayout />
 <div class="book-section">
     <h3>Book Details</h3>
 
-    @Id
+
     @if (selectedBook != null)
     {
-        <div class="book-details">
-            <div class="image-section">
-                <img src="@bookInfo.ImageLinks?.Large" alt="Not Available" class="book-image" />
-            </div>
-            <h4>@bookInfo.Title</h4>
-            <p><strong>Authors:</strong> @bookInfo.Authors</p>
-            <p><strong>Description:</strong> @bookInfo.Description</p>
-            <p><strong>Publisher:</strong> @bookInfo.Publisher</p>
-            <p><strong>Published Date:</strong> @bookInfo.PublishedDate</p>
-            <p><strong>Page Count:</strong> @bookInfo.PageCount</p>
-            <p><strong>Language:</strong> @bookInfo.Language</p>
-            @if (!string.IsNullOrEmpty(selectedBook.SaleInfo?.BuyLink))
-            {
-                <a href="@selectedBook.SaleInfo.BuyLink" class="buy-link">Buy Link</a>
-            }
-        </div>
-    }
-
-    @if (news != null)
-    {
-        <div class="news-section">
-            <h4>Related News Articles</h4>
-            @for (int i = 0; i < 5; i++)
-            {
-                <div class="news-article">
-                    <div>
-                        <h4>@articles[i].Title</h4>
-                        <p>@articles[i].PublishedAt</p>
-                    </div>
-                    <p>@articles[i].Description</p>
-                   
-                    <div>
-                        <p>Source: </p>
-                        <a href="@articles[i].Url">Link</a>
-                    </div>
+            <div class="book-details">
+                <div class="image-section">
+                    <img src="@bookInfo.ImageLinks?.Large" alt="Not Available" class="book-image" />
                 </div>
-            }
-        </div>
-    }
+                <h4>@bookInfo.Title</h4>
+                <p><strong>Authors:</strong> @bookInfo.Authors</p>
+                <p><strong>Description:</strong> @(bookInfo.Description ?? "Not Available")</p>
+                <p><strong>Publisher:</strong> @bookInfo.Publisher</p>
+                <p><strong>Published Date:</strong> @bookInfo.PublishedDate</p>
+                <p><strong>Page Count:</strong> @bookInfo.PageCount</p>
+                <p><strong>Language:</strong> @bookInfo.Language</p>
+                @if (!string.IsNullOrEmpty(selectedBook.SaleInfo?.BuyLink))
+                {
+                    <a href="@selectedBook.SaleInfo.BuyLink" class="buy-link">Buy Link</a>
+                }
+            </div>
+    
 
-    <p class="categories"><strong>Categories:</strong> @categories</p>
+        @if (news != null)
+        {
+            <div class="news-section">
+                <h4>Related News Articles</h4>
+                @for (int i = 0; i < newsCount; i++)
+                {
+                    <div class="news-article">
+                        <div>
+                            <h4>@articles[i].Title</h4>
+                            <p>@articles[i].PublishedAt</p>
+                        </div>
+                        <p>@articles[i].Description</p>
+                   
+                        <div>
+                            <p>Source: </p>
+                            <a href="@articles[i].Url">Link</a>
+                        </div>
+                    </div>
+                }
+            </div>
+        }
+
+        <p class="categories"><strong>Categories:</strong> @categories</p>
+    } else
+    {
+        <h1>ID Invalid Please Go Back And Search Again. Thank you. </h1>
+    }
 </div>
 
 @code {
@@ -61,7 +69,7 @@
 
     public Book selectedBook;
     public VolumeInfo bookInfo;
-
+    public int newsCount;
     public NewsApiResponseModel news;
     public List<Article> articles;
     public bool error { get; set; } = false;
@@ -70,15 +78,22 @@
 
     protected override async Task OnInitializedAsync()
     {
-        await CallAPI();
-        var uri = Navigation.ToAbsoluteUri(Navigation.Uri);
-
-        if (QueryHelpers.ParseQuery(uri.Query).TryGetValue("categories", out var category))
+        if (!userSession.IsLoggedIn)
         {
-            categories = category.ToString() ?? " ";
+            NavigationManager.NavigateTo("/login");
         }
+        else
+        {
+            await CallAPI();
+            var uri = Navigation.ToAbsoluteUri(Navigation.Uri);
 
-        await CallNewsAPI();
+            if (QueryHelpers.ParseQuery(uri.Query).TryGetValue("categories", out var category))
+            {
+                categories = category.ToString() ?? " ";
+            }
+
+            await CallNewsAPI();
+        }
     }
 
     public async Task CallAPI()
@@ -95,6 +110,13 @@
             if (news != null)
             {
                 articles = news.Articles;
+                if(articles.Count() < 5)
+                {
+                    newsCount = articles.Count();
+                } else
+                {
+                    newsCount = 5;
+                }
             }
         }
     }

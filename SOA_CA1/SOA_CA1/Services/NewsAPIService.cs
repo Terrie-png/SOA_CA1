@@ -7,6 +7,7 @@ namespace SOA_CA1.Services
 {
 	public class NewsAPIService :BaseWebService<NewsApiResponseModel>, INewsAPIService
 	{ 
+		private NewsApiResponseModel cache_news { get; set; } = new NewsApiResponseModel();
 		public NewsAPIService(IConfiguration configuration):base(configuration, "NewsAPI")
 		{
 		}
@@ -23,20 +24,24 @@ namespace SOA_CA1.Services
 				try
 				{
 					NewsApiResponseModel news = JsonSerializer.Deserialize<NewsApiResponseModel>(response.Content);
-                    
-					return news;
+                    cache_news = news;
+					return cache_news;
 				}
 				catch (JsonException ex)
 				{
 					// Log or handle the deserialization error
 					Debug.WriteLine($"Deserialization error: {ex.Message}");
-					throw new InvalidOperationException("Failed to parse news search response.", ex);
-				}
+                    Console.WriteLine(new InvalidOperationException("Failed to parse news search response.", ex));
+					return null;
+
+                }
 			}
 			else
 			{
-				throw new InvalidOperationException($"Failed to retrieve news: {response.ErrorMessage}");
-			}
+                Console.WriteLine(new InvalidOperationException($"Failed to retrieve news: {response.ErrorMessage}"));
+				return null;
+
+            }
 		}
 	}
 }

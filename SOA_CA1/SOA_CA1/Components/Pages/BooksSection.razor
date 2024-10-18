@@ -1,27 +1,33 @@
 ﻿@page "/Books"
+@page "/"
 @using SOA_CA1.Services.Interfaces
-@inject IGoogleBooksService service
-
 @using SOA_CA1.Clients.Models
+@inject IGoogleBooksService service
+@inject Blazored.SessionStorage.ISessionStorageService sessionStorage
+@inject NavigationManager NavigationManager
+@inject UserSession userSession
 
+<SOA_CA1.Components.Layout.HeaderLayout/>
 <div class="search-container">
+
     <h3>Books Section</h3>
     <div class="search-bar">
         <input class="search-input" placeholder="Search here ..." @bind="searchQuery" />
         <button class="search-button" @onclick="CallAPI">Search</button>
 
-        <button class="sort-button" @onclick="SortByAlphabet"> Sort @if (isAscending)
+        <button class="sort-button" @onclick="SortByAlphabet">
+            Sort @if (isAscending)
             {
                 <span>Ascending</span>
-            } else
+            }
+            else
             {
                 <span>Descending</span>
             }
         </button>
-        
 
         <button class="sort-button" @onclick="SortByDate"> Sort by Date </button>
-        
+
     </div>
 </div>
 
@@ -51,8 +57,6 @@
                 </div>
             }
         </div>
-
-        
     }
 }
 
@@ -60,12 +64,18 @@
     private GoogleBooksResponseModel result;
     private string searchQuery = "";
     private bool searched = false;
-    private bool showFilterDropdown = false;
-    private string selectedCategory = "";
-    private string selectedAuthor = "";
     private bool isAscending = true;
     private bool isDateAscending = true;
     public int currentPage = 1;
+
+    protected override async Task OnInitializedAsync()
+    {
+        Console.WriteLine("You are logged in : " + userSession.Username);
+        if (!userSession.IsLoggedIn)
+        {
+            NavigationManager.NavigateTo("/login");
+        }
+    }
 
     public async Task CallAPI()
     {
@@ -75,29 +85,37 @@
             searchQuery = "flower";
         }
 
-        result = await service.SearchAsync(searchQuery);
+        var newResult = await service.SearchAsync(searchQuery);
+        if (newResult != null)
+        {
+            result = newResult;
+        }
     }
 
     private async Task SortByAlphabet()
     {
-        if(result != null)
+        if (result != null && searched)
         {
-            result = service.SortBooksAlphabet(isAscending);
+            var newResult = service.SortBooksAlphabet(isAscending);
+            if(newResult != null)
+            {
+                result = newResult;
+            }
             isAscending = !isAscending;
         }
 
-        Console.Write(result.TotalItems);
     }
 
     private async Task SortByDate()
     {
-        if (result != null)
+        if (result != null && searched)
         {
-            result = service.SortBooksByDate(isDateAscending);
+            var newResult = service.SortBooksByDate(isDateAscending);
+            if(newResult != null)
+            {
+                result = newResult;
+            }
             isDateAscending = !isDateAscending;
         }
-
-        Console.Write(result.TotalItems);
     }
-
 }

@@ -86,6 +86,6 @@ main {
 
 
 .main-body {
-	min-height: calc(90vh - 19px); /* Adjust based on header and footer height */
+	min-height: calc(95vh - 25px); /* Adjust based on header and footer height */
 	padding-bottom: 60px; /* Ensure footer does not overlap content */
 }

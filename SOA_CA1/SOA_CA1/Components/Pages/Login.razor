@@ -1,32 +1,53 @@
-﻿@page "/Login"
+﻿@page "/login"
 @using SOA_CA1.Services.Interfaces
-@inject IAuthenticationService service
+@inject IUserService userService
+@inject NavigationManager NavigationManager
+@inject UserSession userSession
 
-<h3>Login</h3>
 
-<div>
-    <label>Username:</label>
-    <input @bind="username" />
+<SOA_CA1.Components.Layout.HeaderLayout />
+<div class="form-container">
+    <h2>Login</h2>
+
+    <div class="form-group">
+        <label>Username:</label>
+        <input @bind="username" placeholder="Enter your username" />
+    </div>
+
+    <div class="form-group">
+        <label>Password:</label>
+        <input @bind="password" type="password" placeholder="Enter your password" />
+    </div>
+
+    <button class="submit-button" @onclick="LoginMethod">Login</button>
+
+    <a href="/register" class="register-link">Don't have an account? Register here.</a>
+
+    @if (loginFailed)
+    {
+        <p class="error-message">Login failed. Please check your credentials.</p>
+    }
 </div>
-<div>
-    <label>Password:</label>
-    <input @bind="password" type="password" />
-</div>
-
-<button @onclick="Login">Login</button>
-
-@if (loginFailed)
-{
-    <p style="color:red;">Login failed. Please check your credentials.</p>
-}
 
 @code {
     private string username;
     private string password;
     private bool loginFailed = false;
 
-    private void Login()
+    private void LoginMethod()
     {
-        loginFailed = !userService.ValidateLogin(username, password);
+        if (userService.ValidateLogin(username, password))
+        {
+            // If login is successful, store the username in session
+            userSession.Username = username;
+            userSession.IsLoggedIn = true;
+
+            // Navigate to a protected page or home page
+            NavigationManager.NavigateTo("/");
+        }
+        else
+        {
+            loginFailed = true;
+        }
     }
 }

@@ -1,3 +1,6 @@
+using Blazored.LocalStorage;
+using Blazored.SessionStorage;
+using SOA_CA1;
 using SOA_CA1.Clients.Models;
 using SOA_CA1.Components;
 using SOA_CA1.Services;
@@ -6,9 +9,16 @@ using SOA_CA1.Services.Interfaces;
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddSingleton(builder.Configuration);
+
 // Add services to the container.
+builder.Services.AddBlazoredSessionStorage();
+builder.Services.AddBlazoredLocalStorage();
 builder.Services.AddRazorComponents()
 	.AddInteractiveServerComponents();
+
+
+builder.Services.AddScoped<UserSession>();
+
 builder.Services.AddScoped<IGoogleBooksService, GoogleBooksService>();
 builder.Services.AddScoped<INewsAPIService, NewsAPIService>();
 builder.Services.AddScoped<IUserService, UserService>();
