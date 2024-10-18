@@ -1,4 +1,0 @@
-﻿ID,Username,Password,Email,Sex
-0,john_doe,hashedpassword123,john@example.com,1
-1,jane_smith,hashedpassword456,jane@example.com,0
-2,admin,admin,admin@admin.com,1
