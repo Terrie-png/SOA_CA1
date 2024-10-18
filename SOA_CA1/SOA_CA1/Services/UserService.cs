@@ -53,7 +53,7 @@ namespace SOA_CA1.Services
                 }
             }
 
-            int sexID = (int)Enum.Parse(typeof(EnumSex), sex);
+            int sexID = (int)Enum.Parse(typeof(EnumSex), sex.ToUpper());
            
 
             using (var writer = new StreamWriter(csvFilePath, true))
