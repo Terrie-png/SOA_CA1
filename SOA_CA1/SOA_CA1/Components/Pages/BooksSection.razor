@@ -10,9 +10,17 @@
         <input class="search-input" placeholder="Search here ..." @bind="searchQuery" />
         <button class="search-button" @onclick="CallAPI">Search</button>
 
-        <button class="sort-button" @onclick="SortByAlphabet">Sort A-Z</button>
+        <button class="sort-button" @onclick="SortByAlphabet"> Sort @if (isAscending)
+            {
+                <span>Ascending</span>
+            } else
+            {
+                <span>Descending</span>
+            }
+        </button>
+        
 
-        <button class="sort-button" @onclick="SortByDate">Sort by Date </button>
+        <button class="sort-button" @onclick="SortByDate"> Sort by Date </button>
         
     </div>
 </div>
@@ -37,12 +45,14 @@
                     <div class="book-info">
                         <h4>@(volume.VolumeInfo.Title ?? "Title not available")</h4>
                         <p>Authors: @(volume.VolumeInfo.Authors != null ? string.Join(", ", volume.VolumeInfo.Authors) : "Authors not available")</p>
-                        <p class="description">Description: @(volume.VolumeInfo.Description ?? "Description not available")</p>
+                        <p> Published Year: @(volume.VolumeInfo.PublishedDate ?? "Not Available")</p>
                         <a href="/Books/@volume.Id?categories=@(volume.VolumeInfo.Categories != null ? Uri.EscapeDataString(string.Join(",", volume.VolumeInfo.Categories)) : "null")" class="btn">Select</a>
                     </div>
                 </div>
             }
         </div>
+
+        
     }
 }
 
@@ -54,7 +64,8 @@
     private string selectedCategory = "";
     private string selectedAuthor = "";
     private bool isAscending = true;
-
+    private bool isDateAscending = true;
+    public int currentPage = 1;
 
     public async Task CallAPI()
     {
@@ -82,8 +93,8 @@
     {
         if (result != null)
         {
-            result = service.SortBooksByDate(isAscending);
-            isAscending = !isAscending;
+            result = service.SortBooksByDate(isDateAscending);
+            isDateAscending = !isDateAscending;
         }
 
         Console.Write(result.TotalItems);

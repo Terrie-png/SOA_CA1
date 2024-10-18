@@ -50,8 +50,41 @@ namespace SOA_CA1.Services
 			}
 		}
 
+		public async Task<GoogleBooksResponseModel> SearchAsync(string query, int currentPage = 1)
+		{
+			var currentIndex = (currentPage - 1) * maxBooks;
+            var request = new RestRequest();
+            request.AddParameter("q", query);
+            request.AddParameter("key", _apiKey);
+			request.AddParameter("startIndex", currentIndex);
+            request.AddParameter("maxResults", maxBooks);
+            var response = await _client.ExecuteAsync(request);
+
+            if (response.IsSuccessful && !string.IsNullOrWhiteSpace(response.Content))
+            {
+                try
+                {
+                    GoogleBooksResponseModel books = JsonSerializer.Deserialize<GoogleBooksResponseModel>(response.Content);
+                    SearchedBooks = books.Books;
+                    cacheBook = books;
+                    return books;
+                }
+                catch (JsonException ex)
+                {
+                    // Log or handle the deserialization error
+                    Debug.WriteLine($"Deserialization error: {ex.Message}");
+                    throw new InvalidOperationException("Failed to parse book search response.", ex);
+                }
+            }
+            else
+            {
+                throw new InvalidOperationException($"Failed to retrieve books: {response.ErrorMessage}");
+            }
+        }
+
         public GoogleBooksResponseModel SortBooksAlphabet(bool ascending)
         {
+			
             if (SearchedBooks == null || !SearchedBooks.Any())
             {
                 return cacheBook;
