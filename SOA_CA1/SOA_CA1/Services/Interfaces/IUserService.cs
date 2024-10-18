@@ -2,5 +2,7 @@
 {
     public interface IUserService
     {
+        public bool ValidateLogin(string username, string password);
+        public bool RegisterUser(string username, string password);
     }
 }
