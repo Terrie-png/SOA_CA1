@@ -4,14 +4,17 @@ using SOA_CA1.Clients.Models;
 using SOA_CA1.Services.Interfaces;
 using System.Diagnostics;
 using SOA_CA1;
+using System.ComponentModel;
 
 namespace SOA_CA1.Services
 {
 	public class GoogleBooksService :BaseWebService<GoogleBooksResponseModel>, IGoogleBooksService
 	{
+		public GoogleBooksResponseModel cacheBook { get; set; }
 		public IEnumerable<Book> SearchedBooks { get; set; }
 		public string SearchedText { get; set; }
 		static readonly int maxBooks = 40;
+		public int TotalBooksResult { get; set; }
 
 		public GoogleBooksService(IConfiguration configuration):base(configuration, "GoogleBookAPI")
 		{
@@ -31,7 +34,8 @@ namespace SOA_CA1.Services
 				{
 					GoogleBooksResponseModel books = JsonSerializer.Deserialize<GoogleBooksResponseModel>(response.Content);
                     SearchedBooks = books.Books;
-					return books;
+					cacheBook = books; 
+                    return books;
 				}
 				catch (JsonException ex)
 				{
@@ -46,10 +50,42 @@ namespace SOA_CA1.Services
 			}
 		}
 
-		public async Task<Book> GetBookByIdAsync(string id)
+        public GoogleBooksResponseModel SortBooksAlphabet(bool ascending)
+        {
+            if (SearchedBooks == null || !SearchedBooks.Any())
+            {
+                return cacheBook;
+            }
+
+            IEnumerable<Book> sortedBooks = ascending
+                ? SearchedBooks.Where(book => !string.IsNullOrEmpty(book.VolumeInfo?.Title))
+                                .OrderBy(book => book.VolumeInfo.Title)
+                : SearchedBooks.Where(book => !string.IsNullOrEmpty(book.VolumeInfo?.Title))
+                                .OrderByDescending(book => book.VolumeInfo.Title);
+
+            cacheBook.Books = sortedBooks.ToList();
+            return cacheBook;
+        }
+
+
+        public GoogleBooksResponseModel SortBooksByDate(bool ascending)
+        {
+            if (SearchedBooks == null || !SearchedBooks.Any())
+            {
+                return cacheBook;
+            }
+
+			IEnumerable<Book> sortedBooks = ascending ? SearchedBooks.Where(book => !string.IsNullOrEmpty(book.VolumeInfo?.PublishedDate)).OrderBy(book => book.VolumeInfo.PublishedDate)
+										:SearchedBooks.Where(book => !string.IsNullOrEmpty(book.VolumeInfo?.PublishedDate)).OrderByDescending(book => book.VolumeInfo.PublishedDate);
+
+			cacheBook.Books = sortedBooks.ToList();
+			return cacheBook;
+		}
+
+        public async Task<Book> GetBookByIdAsync(string id)
 		{
 			var request = new RestRequest($"/{id}");
-            request.AddParameter("key", "AIzaSyBlQNMSHNAM4Z2tZV_he03yIEnG5ddp9oo");
+            request.AddParameter("key", _apiKey);
             var response = await _client.ExecuteAsync(request);
 
 			if (response.IsSuccessful && !string.IsNullOrWhiteSpace(response.Content))

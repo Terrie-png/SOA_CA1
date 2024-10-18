@@ -9,8 +9,10 @@ namespace SOA_CA1.Clients.Models
         [JsonPropertyName("totalItems")]
         public int? TotalItems { get; set; }
         [JsonPropertyName("items")]
-        public List<Book>? Books { get; set; }
+        public List<Book> Books { get; set; }
 
     }
+
+
 }
 

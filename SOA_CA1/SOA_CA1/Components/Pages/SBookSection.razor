@@ -22,9 +22,11 @@
             <p><strong>Publisher:</strong> @bookInfo.Publisher</p>
             <p><strong>Published Date:</strong> @bookInfo.PublishedDate</p>
             <p><strong>Page Count:</strong> @bookInfo.PageCount</p>
-            <p><strong>Average Rating:</strong> @bookInfo.AverageRating</p>
             <p><strong>Language:</strong> @bookInfo.Language</p>
-            <p><a href="@selectedBook.SaleInfo.BuyLink" target="_blank" class="buy-link">Buy Link</a></p>
+            @if (!string.IsNullOrEmpty(selectedBook.SaleInfo?.BuyLink))
+            {
+                <a href="@selectedBook.SaleInfo.BuyLink" class="buy-link">Buy Link</a>
+            }
         </div>
     }
 
@@ -35,7 +37,16 @@
             @for (int i = 0; i < 5; i++)
             {
                 <div class="news-article">
-                    <p>@articles[i].Title</p>
+                    <div>
+                        <h4>@articles[i].Title</h4>
+                        <p>@articles[i].PublishedAt</p>
+                    </div>
+                    <p>@articles[i].Description</p>
+                   
+                    <div>
+                        <p>Source: </p>
+                        <a href="@articles[i].Url">Link</a>
+                    </div>
                 </div>
             }
         </div>

@@ -8,5 +8,9 @@ namespace SOA_CA1.Services.Interfaces
 		public Task<GoogleBooksResponseModel> SearchAsync(string query);
 
 		public Task<Book> GetBookByIdAsync(string id);
-	}
+
+        public GoogleBooksResponseModel SortBooksAlphabet(bool ascending);
+        public GoogleBooksResponseModel SortBooksByDate(bool ascending);
+
+    }
 }

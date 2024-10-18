@@ -9,6 +9,11 @@
     <div class="search-bar">
         <input class="search-input" placeholder="Search here ..." @bind="searchQuery" />
         <button class="search-button" @onclick="CallAPI">Search</button>
+
+        <button class="sort-button" @onclick="SortByAlphabet">Sort A-Z</button>
+
+        <button class="sort-button" @onclick="SortByDate">Sort by Date </button>
+        
     </div>
 </div>
 
@@ -18,7 +23,7 @@
     {
         <p>Loading Books...</p>
     }
-    else if (result.Books == null || result.Books.Count == 0)
+    else if (result.Books == null)
     {
         <p>No Books Found</p>
     }
@@ -41,12 +46,15 @@
     }
 }
 
-
-
 @code {
     private GoogleBooksResponseModel result;
     private string searchQuery = "";
     private bool searched = false;
+    private bool showFilterDropdown = false;
+    private string selectedCategory = "";
+    private string selectedAuthor = "";
+    private bool isAscending = true;
+
 
     public async Task CallAPI()
     {
@@ -55,6 +63,30 @@
         {
             searchQuery = "flower";
         }
+
         result = await service.SearchAsync(searchQuery);
     }
+
+    private async Task SortByAlphabet()
+    {
+        if(result != null)
+        {
+            result = service.SortBooksAlphabet(isAscending);
+            isAscending = !isAscending;
+        }
+
+        Console.Write(result.TotalItems);
+    }
+
+    private async Task SortByDate()
+    {
+        if (result != null)
+        {
+            result = service.SortBooksByDate(isAscending);
+            isAscending = !isAscending;
+        }
+
+        Console.Write(result.TotalItems);
+    }
+
 }
